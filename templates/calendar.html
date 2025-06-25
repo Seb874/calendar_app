@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schedule</title>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <style>
+        #calendar {
+            max-width: 600px;
+            margin: 40px auto;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center;">Select the days you want me to come in to the office</h2>
+
+    <form action="/submit" method="post" style="text-align: center;">
+        <input type="hidden" id="availability" name="availability">
+        <input type="submit" value="Submit">
+    </form>
+
+    <div id="calendar"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectedDates = [];
+            const calendarEl = document.getElementById('calendar');
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                selectable: true,
+                select: function (info) {
+                    const dateStr = info.startStr;
+                    const existingIndex = selectedDates.indexOf(dateStr);
+                    if (existingIndex >= 0) {
+                        selectedDates.splice(existingIndex, 1);
+                        calendar.getEventById(dateStr)?.remove();
+                    } else {
+                        selectedDates.push(dateStr);
+                        calendar.addEvent({
+                            id: dateStr,
+                            title: 'Come in',
+                            start: dateStr,
+                            allDay: true
+                        });
+                    }
+
+                    document.getElementById('availability').value = selectedDates.join(', ');
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+</body>
+</html>
